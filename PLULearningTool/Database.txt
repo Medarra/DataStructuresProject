@@ -1,0 +1,4 @@
+apple|2114|1.99
+banana|3220|1.49
+strawberry|4567|3.49
+orange|7411|1.29

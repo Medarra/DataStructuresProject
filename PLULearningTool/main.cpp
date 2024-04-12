@@ -20,7 +20,7 @@ typedef struct CartItem {
 
 typedef struct PLUTable {
     Item* table[SIZE];
-};
+} PLUTable;
 
 //used by the results screen to show mistakes
 typedef struct Result {
@@ -44,6 +44,7 @@ int generateHash(char* itemName, int PLU) {
         int asciiValue = itemName[i];
         hash = (hash + asciiValue + PLU) % SIZE;
     }
+    return hash;
 }
 
 Item* initializeItem(char* nameofItem, int PLUOfItem, double priceOfItem) {
@@ -57,6 +58,8 @@ Item* initializeItem(char* nameofItem, int PLUOfItem, double priceOfItem) {
     newItem->PLU = PLUOfItem;
     newItem->price = priceOfItem;
     newItem->NextItemValuePair = NULL;
+
+    return newItem;
 }
 
 PLUTable* initializePLUTable(void) {
@@ -69,6 +72,8 @@ PLUTable* initializePLUTable(void) {
     for (int i = 0; i < SIZE; i++) {
         table->table[i] = NULL;
     }
+
+    return table;
 }
 
 void insertItemToTable(PLUTable* table, char* nameOfItem, int PLUOfItem, double costOfItem) {
@@ -81,8 +86,7 @@ void insertItemToTable(PLUTable* table, char* nameOfItem, int PLUOfItem, double 
         return;
     }
 
-    Item* current = table->table[hash]
-
+    Item* current = table->table[hash];
 }
 
 
