@@ -28,15 +28,6 @@ typedef struct Result {
     int incorrectPLU;
 } Result;
 
-//==== = Database.txt==== =
-//
-//Text file listing all Item data
-//
-//
-//
-//-Format -
-//
-//<Item Name(string)> | <PLU Code(int)> | <Price(double)>
 
 int generateHash(char* itemName, int PLU) {
     int hash = 0;
@@ -154,4 +145,26 @@ int main(void)
     } while (choice != '4');
 
     return 0;
+}
+
+int makeChange(double cost, double asdf) {
+    int userChoice = 0;
+    const char* changeTypes[10] = { "Nickels", "Dimes", "Quarters", "Loonies", "Twoonies", "5's", "10's" };
+    int changeCounter[7] = { 0 };
+
+    do {
+        system("CLS");
+        printf("");
+        for (int i = 0; i < 7; i++) {
+            printf("Number of %s:\t%d", changeTypes[i], changeCounter[i]);
+        }
+
+        userChoice = getch() - '0';
+        if (userChoice > 0 && userChoice < 8) {
+            changeCounter[userChoice - 1]++;
+        }
+    } while (userChoice != '\r');
+
+    // calculate change here
+    double change = 0;
 }
