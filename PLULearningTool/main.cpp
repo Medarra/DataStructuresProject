@@ -29,11 +29,11 @@ typedef struct Result {
 } Result;
 
 
-int generateHash(char* itemName, int PLU) {
+int generateHash(char* itemName) {
     int hash = 0;
     for (int i = 0; itemName[i] != '\0'; i++) {
         int asciiValue = itemName[i];
-        hash = (hash + asciiValue + PLU) % SIZE;
+        hash = (hash + asciiValue)  % SIZE;
     }
     return hash;
 }
@@ -68,7 +68,7 @@ PLUTable* initializePLUTable(void) {
 }
 
 void insertItemToTable(PLUTable* table, char* nameOfItem, int PLUOfItem, double costOfItem) {
-    int hash = generateHash(nameOfItem, PLUOfItem);
+    int hash = generateHash(nameOfItem);
 
     Item* newItem = initializeItem(nameOfItem, PLUOfItem, costOfItem);
 
@@ -78,6 +78,45 @@ void insertItemToTable(PLUTable* table, char* nameOfItem, int PLUOfItem, double 
     }
 
     Item* current = table->table[hash];
+    while (current->NextItemValuePair != NULL) {
+        current = current->NextItemValuePair;
+    }
+
+    current->NextItemValuePair = newItem;
+}
+
+Item* searchForItemInformation(PLUTable* table, char* itemName) {
+    int hash = generateHash(itemName);
+
+    if (table->table[hash] == NULL) {
+        printf("ERROR: Cannot find the word!");
+        return NULL;
+    }
+
+    Item* current = table->table[hash];
+
+    while (current != NULL) {
+        if (strcmp(current->name, itemName) == 0) {
+            return current;
+        }
+
+        current = current->NextItemValuePair;
+    }
+
+    return NULL;
+}
+
+void printPLUSheet(PLUTable* table) {
+    system("CLS");
+    printf("PLU Cheat Sheet\n");
+    printf("===================\n");
+    for (int i = 0; i < SIZE; i++) {
+        Item* current = table->table[i];
+        while (current != NULL) {
+            printf("%s ........................ %d\n", current->name, current->PLU);
+            current = current->NextItemValuePair;
+        }
+    }
 }
 
 
