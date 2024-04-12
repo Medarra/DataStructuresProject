@@ -76,7 +76,7 @@ typedef struct Result {
 //
 //- holds up to 10 items
 
-int main()
+int main(int argc, char *argv[])
 {
     char mainMenuChoice;
 
