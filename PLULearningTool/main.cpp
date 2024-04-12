@@ -1,4 +1,6 @@
+#pragma warning (disable: 4996)
 #include <stdio.h>
+#include <stdlib.h>
 #include <conio.h>
 
 typedef struct Item {
@@ -17,18 +19,6 @@ typedef struct Result {
     Item* itemPTR;
     int incorrectPLU;
 } Result;
-
-//==== = Database.txt==== =
-//
-//Text file listing all Item data
-//
-//
-//
-//-Format -
-//
-//<Item Name(string)> | <PLU Code(int)> | <Price(double)>
-
-
 
 
 
@@ -68,123 +58,30 @@ typedef struct Result {
 
 
 
-
-
-//==== = ARRAY==== =
-//
-//Array that holds the inccorect answers from a game session
-//
-//- holds up to 10 items
-
-int main(int argc, char *argv[])
+int main(void)
 {
-    char mainMenuChoice;
-
-    //==== = USER INTERFACE==== =
-    //
-    //4 Pages: Main Menu, PLU Code Lookup, Game Screen, Result Screen
-    //
-    //(More can be added but we probably don't have time)
+    char choice = '\0';
 
     do
     {
-        printf("\n\nPLU Learning Tool\n");
-        printf("=========\n\n");
-        printf("1.  Main Menu\n");
-        printf("2.  PLU Code Lookup\n");
-        printf("3.  Game Screen\n");
-        printf("4.  Result Screen\n");
-        printf("5.  Exit\n");
+        system("CLS");
+        printf("PLU Learning Tool\n");
+        printf("=================\n\n");
+        printf("1. Create Testing Cart\n");
+        printf("1. Play Testing Session\n");
+        printf("3. View PLU Codes\n");
+        printf("4. Exit\n");
 
-        char choice = getch();
 
-        switch (choice)
-        {
-            //	--Main Menu--
-            //
-            //	Contains 3 options:
-            //
-            //1. Start Game Session
-            //
-            //2. Review PLU Codes
-            //
-            //3. Exit
-            //
-            //
-            //
-            //-Option selected through options number(getch())
-            //
-            //- Any other key press does nothing
-
-        case '1':
-            do
-            {
-                printf("\n\nMAIN MENU\n");
-                printf("=========\n\n");
-                printf("1.  Start Game Session\n");
-                printf("2.  Review PLU Codes\n");
-                printf("3.  Exit\n");
-
-                mainMenuChoice = getch();
-
-                switch (mainMenuChoice)
-                {
-                case '1':
-                    // Start Game Session
-                    break;
-                case '2':
-                    // Review PLU Codes
-                    break;
-                case '3':
-                    // Exit from main menu
-                    break;
-                }
-            } while (mainMenuChoice != '3');
-
+        switch (choice = getch()) {
+        case '1': /*--Create a Cart for testing--*/
             break;
-        case '2':
-            //--PLU Code Lookup--
-            //
-            //Displays entire contents of the Hash Table
-            //
-            //- First displays message to user : "Press <<ESCAPE>> or <<ENTER>> to return to main menu"
-            //
-            //- Use getch() to check for escape / enter key
-            //
-            //- Any other key press does nothing
+        case '2': /*--Play test session--*/
             break;
-        case '3':
-
-            //--Game Screen--
-            //
-            //I LOST THE GAME!
-            //
-            //-Creates a new Cart Stack with random items and a new empty Conveyor Queue
-            //
-            //<WORK IN PROGRESS>
-
-            break;
-        case '4':
-
-            //--Result Screen--
-            //
-            //Displays results of last game session
-            //
-            //<WORK IN PROGRESS>
-            //
-            //-Last displays message to user : "Press <<ESCAPE>> or <<ENTER>> to return to main menu"
-            //
-            //- Use getch() to check for escape / enter key
-            //
-            //- Any other key press does nothing
-
-            break;
-        case '5':
-            return 0; // Exit the program
-        default:
+        case '3': /*--View PLU Codes--*/
             break;
         }
-    } while (1);
+    } while (choice != '4');
 
     return 0;
 }
