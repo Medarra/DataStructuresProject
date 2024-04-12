@@ -116,6 +116,7 @@ Item* searchForItemInformation(PLUTable* table, char* itemName) {
 }
 
 void printPLUSheet(PLUTable* table) {
+    system("CLS");
     printf("PLU Cheat Sheet\n");
     printf("===================\n");
     for (int i = 0; i < SIZE; i++) {
