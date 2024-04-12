@@ -115,6 +115,18 @@ Item* searchForItemInformation(PLUTable* table, char* itemName) {
     return NULL;
 }
 
+void printPLUSheet(PLUTable* table) {
+    printf("PLU Cheat Sheet\n");
+    printf("===================\n");
+    for (int i = 0; i < SIZE; i++) {
+        Item* current = table->table[i];
+        while (current != NULL) {
+            printf("%s ........................ %d\n", current->name, current->PLU);
+            current = current->NextItemValuePair;
+        }
+    }
+}
+
 
 
 
