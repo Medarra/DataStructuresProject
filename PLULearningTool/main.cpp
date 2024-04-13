@@ -1,12 +1,5 @@
-#pragma warning (disable: 4996)
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <conio.h>
+#include "hashtable.h"
 
-#include "hashtable.cpp"
-
-#define NAME_LENGTH 50
 #define CHANGE_NUMBER 7         // Represents the number of different coins/bills that can be given
                                 // as change to the customer (dimes, quarters, etc.)
 

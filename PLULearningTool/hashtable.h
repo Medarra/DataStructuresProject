@@ -4,6 +4,9 @@
 #include <string.h>
 #include <conio.h>
 
+#ifndef HASH_TABLE
+#define HASH_TABLE
+
 #define SIZE 20
 #define NAME_LENGTH 50
 
@@ -107,3 +110,5 @@ void printPLUSheet(PLUTable* table) {
         }
     }
 }
+
+#endif
