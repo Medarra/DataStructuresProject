@@ -5,16 +5,19 @@
 #include <conio.h>
 
 # define SIZE 20
+#define NAME_LENGTH 50
+#define CHANGE_NUMBER 7         // Represents the number of different coins/bills that can be given
+                                // as change to the customer (dimes, quarters, etc.)
 
 typedef struct Item {
-    char name[100];
+    char name[NAME_LENGTH];
     int PLU;
     double price;
     struct Item* NextItemValuePair;
 } Item;
 
 typedef struct CartItem {
-    char name[100];
+    char name[NAME_LENGTH];
     double weight;
 } CartItem;
 
@@ -162,7 +165,13 @@ int main(void)
 
         switch (choice = getch()) {
         case '1': /*--Create a Cart for testing--*/
-            makeChange(25,43.40);
+            if (makeChange(25, 47.20) == 0) {
+                printf("good\n");
+            }
+            else {
+                printf("bad\n");
+            }
+            getch();
             break;
         case '2': /*--Play test session--*/
             break;
@@ -179,10 +188,6 @@ int main(void)
 }
 
 void fillLookupTable(PLUTable* lookupTable) {
-
-    char* firstSplit = NULL;
-    char* secondSplit = NULL;
-
     FILE* database = NULL;
     if ((database = fopen("Database.txt", "r")) == NULL) {
         printf("An error occured while attempting to open the database file...");
@@ -190,27 +195,29 @@ void fillLookupTable(PLUTable* lookupTable) {
     }
 
     while (!feof(database)) {
-        char data[100] = { 0 };
-        if (fgets(data, 99, database) == NULL) {
+        char data[NAME_LENGTH] = { 0 };
+        if (fgets(data, NAME_LENGTH - 1, database) == NULL) {
             continue;
         }
 
         // create temporary parsing variables
-        char name[100] = { 0 };
-        char pluTemp[100] = { 0 };
-        int plu = 0;
-        double price = 0.00;
+        char name[NAME_LENGTH] = { 0 };
+        char pluTemp[NAME_LENGTH] = { 0 };
 
-        firstSplit = strchr(data, '|');
-        secondSplit = strrchr(data, '|');
+        char* firstSplit = strchr(data, '|');
+        char* secondSplit = strrchr(data, '|');
+
         strncpy(name, data, (firstSplit - data));
         strncpy(pluTemp, firstSplit + 1, (secondSplit - firstSplit));
-        plu = atoi(pluTemp);
-        price = atof(secondSplit + 1);
-        insertItemToTable(lookupTable, name, plu, price);
+        pluTemp[NAME_LENGTH - 1] = '\0';
+
+        insertItemToTable(lookupTable, name, atoi(pluTemp), atof(secondSplit + 1));
     }
 
-    fclose(database);
+    if ((fclose(database)) != 0) {
+        printf("An error occured while attempting to close file");
+        exit(EXIT_FAILURE);
+    }
 }
 
 int makeChange(double cost, double received) {
@@ -218,15 +225,15 @@ int makeChange(double cost, double received) {
 
     // Setup for change calculation
     const char* changeTypes[10] = { "Nickels", "Dimes", "Quarters", "Loonies", "Toonies", "5's", "10's" };
-    double changeAmount[7] = { 0.05, 0.10, 0.25, 1.00, 2.00, 5.00, 10.00 };
-    int changeCounter[7] = { 0 };
+    double changeAmount[CHANGE_NUMBER] = { 0.05, 0.10, 0.25, 1.00, 2.00, 5.00, 10.00 };
+    int changeCounter[CHANGE_NUMBER] = { 0 };
 
     do {
         // Displays instructions to the user
         system("CLS");
         printf("Total Cart Cost: $%.2lf\nMoney Received from Customer: $%.2lf\n\n", cost, received);
         printf("Use the numberpad to select change.\nPress <ENTER> to finish and 'r' to reset.\n\n");
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < CHANGE_NUMBER; i++) {
             printf("%d. Number of %s:\t%10d\n", (i + 1), changeTypes[i], changeCounter[i]);
         }
 
@@ -236,7 +243,7 @@ int makeChange(double cost, double received) {
             changeCounter[userChoice - '0' - 1]++;
         }
         else if (userChoice == 'r') {
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < CHANGE_NUMBER; i++) {
                 changeCounter[i] = 0;
             }
         }
@@ -244,7 +251,7 @@ int makeChange(double cost, double received) {
 
     // Calculates total change given
     double change = 0;
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < CHANGE_NUMBER; i++) {
         change += (changeAmount[i] * changeCounter[i]);
     }
 
