@@ -139,12 +139,15 @@ void printPLUSheet(PLUTable* table) {
 //
 //- holds up to 5 items
 
+// function prototypes
 int makeChange(double, double);
+void fillLookupTable(PLUTable*);
 
 int main(void)
 {
     char choice = '\0';
     PLUTable* lookupTable = initializePLUTable();
+    fillLookupTable(lookupTable);
 
     do
     {
@@ -164,6 +167,8 @@ int main(void)
         case '2': /*--Play test session--*/
             break;
         case '3': /*--View PLU Codes--*/
+            printPLUSheet(lookupTable);
+            getch();
             break;
         }
     } while (choice != '4');
@@ -171,6 +176,41 @@ int main(void)
     // Free resources 
     free(lookupTable);
     return 0;
+}
+
+void fillLookupTable(PLUTable* lookupTable) {
+
+    char* firstSplit = NULL;
+    char* secondSplit = NULL;
+
+    FILE* database = NULL;
+    if ((database = fopen("Database.txt", "r")) == NULL) {
+        printf("An error occured while attempting to open the database file...");
+        exit(EXIT_FAILURE);
+    }
+
+    while (!feof(database)) {
+        char data[100] = { 0 };
+        if (fgets(data, 99, database) == NULL) {
+            continue;
+        }
+
+        // create temporary parsing variables
+        char name[100] = { 0 };
+        char pluTemp[100] = { 0 };
+        int plu = 0;
+        double price = 0.00;
+
+        firstSplit = strchr(data, '|');
+        secondSplit = strrchr(data, '|');
+        strncpy(name, data, (firstSplit - data));
+        strncpy(pluTemp, firstSplit + 1, (secondSplit - firstSplit));
+        plu = atoi(pluTemp);
+        price = atof(secondSplit + 1);
+        insertItemToTable(lookupTable, name, plu, price);
+    }
+
+    fclose(database);
 }
 
 int makeChange(double cost, double received) {
@@ -211,11 +251,5 @@ int makeChange(double cost, double received) {
     // Print and return result
     printf("\nChange Required: $%.2lf\n", received - cost);
     printf("Change Given: $%.2lf\n", change);
-    
-    if (change == (received - cost)) {
-        return 0;
-    }
-    else {
-        return 1;
-    }
+    return change == (received - cost) ? 0 : 1;
 }
