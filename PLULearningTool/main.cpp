@@ -1,12 +1,18 @@
 #include "hashtable.h"
 
 #define CHANGE_NUMBER 7         // Represents the number of different coins/bills that can be given
-                                // as change to the customer (dimes, quarters, etc.)
+// as change to the customer (dimes, quarters, etc.)
+#define MAX_ITEM      10        // Represents the maximum number of items in the cart allowed.
 
 typedef struct CartItem {
     char name[NAME_LENGTH];
     double weight;
 } CartItem;
+
+typedef struct Cart {
+    CartItem* data;
+    int topIndex;
+} Cart;
 
 //used by the results screen to show mistakes
 typedef struct Result {
@@ -21,9 +27,30 @@ typedef struct Result {
 //A cart filled with CartItems
 //
 //- contains exactly 10 items
+Cart* initializeCart(void) {
+    Cart* cart = (Cart*)malloc(sizeof(Cart));
+    cart->data = (CartItem*)malloc(MAX_ITEM * sizeof(CartItem));
 
+    if (cart == NULL) {
+        printf("Not enough memory!");
+        exit(EXIT_FAILURE);
+    }
 
+    if (cart->data == NULL) {
+        printf("Not enough memory!");
+        exit(EXIT_FAILURE);
+    }
 
+    cart->topIndex = -1;
+
+    return cart;
+}
+
+Cart* fillCart(void) {
+    Cart* cart = initializeCart();
+
+    //fill up cart from hash table
+}
 
 
 //==== = QUEUE==== =
