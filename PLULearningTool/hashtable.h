@@ -4,11 +4,56 @@
 #include <string.h>
 #include <conio.h>
 
-#ifndef HASH_TABLE
-#define HASH_TABLE
-
 #define SIZE 20
 #define NAME_LENGTH 50
+#define MAX_INPUT 50
+
+void clearInputBuffer() {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF) {}
+}
+
+void getInteger(const char inputPrompt[], int* result) {
+    char input[MAX_INPUT];
+    bool loop = true;
+    while (loop) {
+        printf("\n%s >> ", inputPrompt);
+        fgets(input, MAX_INPUT - 1, stdin);
+
+        /* Check for a input buffer overflow */
+        if (strchr(input, '\n') == NULL) {
+            clearInputBuffer();
+        }
+
+        if (sscanf(input, "%d", result) == 1) {
+            loop = false;
+        }
+        else {
+            printf("\n--ERROR: Input was not a valid value--\n");
+        }
+    }
+}
+
+void getDouble(const char inputPrompt[], double* result) {
+    char input[MAX_INPUT];
+    bool loop = true;
+    while (loop) {
+        printf("\n%s >> ", inputPrompt);
+        fgets(input, MAX_INPUT - 1, stdin);
+
+        /* Check for a input buffer overflow */
+        if (strchr(input, '\n') == NULL) {
+            clearInputBuffer();
+        }
+
+        if ((sscanf(input, "%lf", result) == 1) && (atof(input) >= 0.00)) {
+            loop = false;
+        }
+        else {
+            printf("\n--ERROR: Input was not a valid value--\n");
+        }
+    }
+}
 
 typedef struct Item {
     char name[NAME_LENGTH];
@@ -77,25 +122,43 @@ void insertItemToTable(PLUTable* table, char* nameOfItem, int PLUOfItem, double 
     current->NextItemValuePair = newItem;
 }
 
-Item* searchForItemInformation(PLUTable* table, char* itemName) {
+char* userInputItem(PLUTable* table, char* itemName) {
+    char choice = '\0';
+    int* plu = NULL;
+    double* price = NULL;
+
+    printf("\nERROR: Cannot find this item to put in our database. Would you like to add it to your cart anyway? (y/n)");
+    switch (choice = getch()) {
+    case 'y':
+        getInteger("What is the PLU of your item?", plu);
+        getDouble("What is the price of your item?", price);
+        insertItemToTable(table, itemName, *plu, *price);
+
+        return itemName;
+    case 'n':
+        return NULL;
+    }
+}
+
+char* searchForItemInformation(PLUTable* table, char* itemName) {
+    
     int hash = generateHash(itemName);
 
     if (table->table[hash] == NULL) {
-        printf("ERROR: Cannot find the word!");
-        return NULL;
+        return userInputItem(table, itemName);
     }
 
     Item* current = table->table[hash];
 
     while (current != NULL) {
         if (strcmp(current->name, itemName) == 0) {
-            return current;
+            return current->name;
         }
 
         current = current->NextItemValuePair;
     }
 
-    return NULL;
+    return userInputItem(table, itemName);
 }
 
 void printPLUSheet(PLUTable* table) {
@@ -111,4 +174,3 @@ void printPLUSheet(PLUTable* table) {
     }
 }
 
-#endif
