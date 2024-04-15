@@ -130,6 +130,27 @@ double searchPriceByName(PLUTable* table, char* itemName) {
     return -1; // Return -1 if item not found
 }
 
+int searchPluByName(PLUTable* table, char* itemName) {
+
+    int hash = generateHash(itemName);
+
+    if (table->table[hash] == NULL) {
+        return -1;
+    }
+
+    Item* current = table->table[hash];
+
+    while (current != NULL) {
+        if (strcmp(current->name, itemName) == 0) {
+            return current->PLU;
+        }
+
+        current = current->NextItemValuePair;
+    }
+
+    return -1; // Return -1 if item not found
+}
+
 void printPLUSheet(PLUTable* table) {
     system("CLS");
     printf("PLU Cheat Sheet\n");

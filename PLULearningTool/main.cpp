@@ -40,7 +40,7 @@ typedef struct Result {
 
 // function prototypes
 void fillLookupTable(PLUTable*);
-double caculateBill(PLUTable* lookupTable, CartItem* queue[]);
+double scanItem(PLUTable* lookupTable, CartItem* queue[]);
 int makeChange(double, double);
 void playtest(CartItem* stack[], CartItem* queue[]);
 
@@ -68,6 +68,7 @@ int main(void)
             getch();
             break;
         case '2': /*--Play test session--*/
+            playtest();
             break;
         case '3': /*--View PLU Codes--*/
             printPLUSheet(lookupTable);
@@ -114,43 +115,44 @@ void fillLookupTable(PLUTable* lookupTable) {
     }
 }
 
-double caculateBill(PLUTable* lookupTable, CartItem* queue[])
+double scanItem(PLUTable* lookupTable, CartItem* queue[])
 {
     CartItem* ptr;
-    char name[NAME_LENGTH];
-    double itemPrice = 0.0;
-    double totalBill = 0.0;
+    int pluOnConveyer = 0;
+    int pluToScan = 0;
+    double itemPrice = 0;
 
     while (!isQueueEmpty()) // Call isQueueEmpty function to check if the queue is empty
     {
-        getString("please enter the name of the items", name); // Use strcpy for string copying
         ptr = queuePop(queue);   // Get an element from the queue
 
         if (ptr == NULL) {
-            continue; // Skip if ptr is NULL
+            break; // break if ptr is NULL
         }
 
-        if (strcmp(name, ptr->name) == 0)
+        pluOnConveyer = searchPluByName(lookupTable, ptr->name);
+
+        getInteger("please enter the PLU in order to scan the item", &pluToScan);
+
+        if (pluToScan == pluOnConveyer)
         {
-            itemPrice = searchPriceByName(lookupTable , name);
-            printf("Item: %s,  price: %f ", ptr->name, itemPrice * ptr->weight);
-            totalBill += itemPrice * ptr->weight;
+            itemPrice = searchPriceByName(lookupTable, ptr->name);
+            printf("Item: %s    Weight: %f    Price: %f \n", ptr->name, ptr->weight, itemPrice * ptr->weight);
+            return itemPrice * ptr->weight;
         }
         else
         {
-            // Re-enter the name and compare again
-            while (strcmp(name, ptr->name) != 0)
+            while (pluToScan != pluOnConveyer)
             {
-                getString("Name does not match. Please enter the correct name: ", name); // Re-enter the name
+                getInteger("PLU does not match. Please enter the correct PLU: ", &pluToScan);
             }
 
             // If the name matches, calculate the price again
-            itemPrice = searchPriceByName(lookupTable, name);
-            totalBill += itemPrice * ptr->weight;
-            printf("Item: %s,  price: %f ", ptr->name, itemPrice * ptr->weight);
+            itemPrice = searchPriceByName(lookupTable, ptr->name);
+            printf("Item: %s    Weight: %f    Price: %f \n", ptr->name, ptr->weight, itemPrice * ptr->weight);
+            return itemPrice * ptr->weight;
         }
     }
-    return totalBill;
 }
 
 int makeChange(double cost, double received) {
@@ -194,7 +196,7 @@ int makeChange(double cost, double received) {
     return change == (received - cost) ? 0 : 1;
 }
 
-void playtest(CartItem* stack[], CartItem* queue[])
+void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[])
 {
     CartItem* ptr;
     double totalBill = 0.0;
@@ -204,14 +206,16 @@ void playtest(CartItem* stack[], CartItem* queue[])
             return -1;
     }
 
-    while (!isQueuefull() && !isQueueEmpty())
+    while (!isQueuefull() && !isStackEmpty())
     {
         ptr = StackPop(stack);
         QueuePush(queue, ptr);
+        printf("%s on the conveyer\n", ptr->name);
 
         if (isQueuefull())
         {
-            totalBill += caculateBill(queue);
+            printf("Conveyer is full, you need to scan the item before you put more on it\n");
+            totalBill += scanItem(lookupTable, queue);
         }
     }
 
