@@ -9,19 +9,30 @@
 
 #define CHANGE_NUMBER 7         // Represents the number of different coins/bills that can be given
 // as change to the customer (dimes, quarters, etc.)
+#define MAX_ITEM      10        // Represents the maximum number of items in the cart allowed.
+#define MAX_CONVEYOR_BELT 5     // Represents the maximum number of items on the belt allowed.
 
 typedef struct CartItem {
     char name[NAME_LENGTH];
     double weight;
+    CartItem* nextItem;
 } CartItem;
+
+typedef struct Cart {
+    CartItem* data;
+    int topIndex;
+} Cart;
+
+typedef struct ConveyorBelt {
+    CartItem* front;
+    CartItem* back;
+} ConveyorBelt;
 
 //used by the results screen to show mistakes
 typedef struct Result {
     Item* itemPTR;
     int incorrectPLU;
 } Result;
-
-
 
 //==== = STACK==== =
 //
