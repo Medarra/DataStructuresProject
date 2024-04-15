@@ -69,7 +69,7 @@ void getString(const char inputPrompt[], char* result) {
 
     /* Remove newline character */
     input[strlen(input) - 1] = '\0';
-    sscanf(input, "%s", result);
+    strcpy(result, input); // Copy input to result
 }
 
 #endif
