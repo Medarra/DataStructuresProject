@@ -1,59 +1,7 @@
-#pragma warning (disable: 4996)
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <conio.h>
+#include "input.h"
 
 #define SIZE 20
 #define NAME_LENGTH 50
-#define MAX_INPUT 50
-
-void clearInputBuffer() {
-    int ch;
-    while ((ch = getchar()) != '\n' && ch != EOF) {}
-}
-
-void getInteger(const char inputPrompt[], int* result) {
-    char input[MAX_INPUT];
-    bool loop = true;
-    while (loop) {
-        printf("\n%s >> ", inputPrompt);
-        fgets(input, MAX_INPUT - 1, stdin);
-
-        /* Check for a input buffer overflow */
-        if (strchr(input, '\n') == NULL) {
-            clearInputBuffer();
-        }
-
-        if (sscanf(input, "%d", result) == 1) {
-            loop = false;
-        }
-        else {
-            printf("\n--ERROR: Input was not a valid value--\n");
-        }
-    }
-}
-
-void getDouble(const char inputPrompt[], double* result) {
-    char input[MAX_INPUT];
-    bool loop = true;
-    while (loop) {
-        printf("\n%s >> ", inputPrompt);
-        fgets(input, MAX_INPUT - 1, stdin);
-
-        /* Check for a input buffer overflow */
-        if (strchr(input, '\n') == NULL) {
-            clearInputBuffer();
-        }
-
-        if ((sscanf(input, "%lf", result) == 1) && (atof(input) >= 0.00)) {
-            loop = false;
-        }
-        else {
-            printf("\n--ERROR: Input was not a valid value--\n");
-        }
-    }
-}
 
 typedef struct Item {
     char name[NAME_LENGTH];
