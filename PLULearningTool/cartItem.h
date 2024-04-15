@@ -1,3 +1,4 @@
+#include <time.h>
 
 #define MAX_ITEM      10        // Represents the maximum number of items in the cart allowed.
 #define MAX_CONVEYOR_BELT 5     // Represents the maximum number of items on the belt allowed.
@@ -18,24 +19,20 @@ typedef struct ConveyorBelt {
 	CartItem* back;
 } ConveyorBelt;
 
+//function prototypes
+Cart* initializeCart(void);
+void pushCart(Cart* cart, char* itemName, double itemWeight);
+char* popCart(Cart* cart);
+bool isCartFull(Cart* cart);
+bool isCartEmpty(Cart* cart);
 
-int countItemInTable(PLUTable* PLUtable) {
-	Item* current = PLUtable->table[0];
+ConveyorBelt* initializingConveyorBelt(void);
 
-	if (current == NULL) {			//error check
-		printf("No item in the table!!!");
-		return 0;
-	}
-
-	int counter = 1;			//initialized to 1 because of loop structure
-
-	while (current->NextItemValuePair != NULL) {	//loop to count until no next element
-		current = current->NextItemValuePair;
-		counter++;
-	}
-
-	return counter;
-}
+/*********************************************************************/
+/*********************************************************************/
+/*****************************    Stack	  ****************************/
+/*********************************************************************/
+/*********************************************************************/
 
 Cart* initializeCart(void) {
 	Cart* cart = (Cart*)malloc(sizeof(Cart));
@@ -57,8 +54,58 @@ Cart* initializeCart(void) {
 	return cart;
 }
 
+void pushCart(Cart* cart, char* itemName, double itemWeight) {
+	if (isCartFull(cart)) {
+		printf("Cart overflow");
+		exit(EXIT_FAILURE);
+	}
+
+	strcpy(cart->data[cart->topIndex].name, itemName);
+	cart->data[++cart->topIndex].weight = itemWeight;
+}
+
+char* popCart(Cart* cart) {
+	if (isCartEmpty(cart)) {
+		printf("Cart underflow");
+		return NULL;
+	}
+
+	return cart->data[cart->topIndex--].name;
+}
+
+bool isCartFull(Cart* cart) {
+	return cart->topIndex == MAX_ITEM - 1;
+}
+
+bool isCartEmpty(Cart* cart) {
+	return cart->topIndex == -1;
+}
+
+/*********************************************************************/
+/*********************************************************************/
+/*****************************    Queue	  ****************************/
+/*********************************************************************/
+/*********************************************************************/
+
+ConveyorBelt* initializingConveyorBelt(void) {
+	ConveyorBelt* belt = (ConveyorBelt*)malloc(sizeof(ConveyorBelt));
+
+
+	if (belt == NULL) {
+		printf("Not enough memory!");
+		exit(EXIT_FAILURE);
+	}
+
+
+	belt->front = NULL;
+	belt->back = NULL;
+
+	return belt;
+}
+
+
 //maybe add push part
-Cart* fillCart(PLUTable* PLUtable) {
+/*Cart* fillCart(PLUTable* PLUtable) {
 	if (PLUtable == NULL) {             //error checking
 		printf("Table is empty!!!");
 		return NULL;
@@ -146,4 +193,4 @@ ConveyorBelt* fillingConveyorBelt(Cart* cart) {
 	}
 
 	return belt;
-}
+}*/
