@@ -1,3 +1,4 @@
+#include <time.h>
 
 #define MAX_ITEM      10        // Represents the maximum number of items in the cart allowed.
 #define MAX_CONVEYOR_BELT 5     // Represents the maximum number of items on the belt allowed.
@@ -19,23 +20,6 @@ typedef struct ConveyorBelt {
 } ConveyorBelt;
 
 
-int countItemInTable(PLUTable* PLUtable) {
-	Item* current = PLUtable->table[0];
-
-	if (current == NULL) {			//error check
-		printf("No item in the table!!!");
-		return 0;
-	}
-
-	int counter = 1;			//initialized to 1 because of loop structure
-
-	while (current->NextItemValuePair != NULL) {	//loop to count until no next element
-		current = current->NextItemValuePair;
-		counter++;
-	}
-
-	return counter;
-}
 
 Cart* initializeCart(void) {
 	Cart* cart = (Cart*)malloc(sizeof(Cart));
