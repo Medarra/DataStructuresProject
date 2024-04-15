@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 #define CHANGE_NUMBER 7         // Represents the number of different coins/bills that can be given
@@ -42,7 +43,8 @@ typedef struct Result {
 void fillLookupTable(PLUTable*);
 double scanItem(PLUTable* lookupTable, CartItem* queue[]);
 int makeChange(double, double);
-void playtest(CartItem* stack[], CartItem* queue[]);
+double generateRandomPayment(double totalBill);
+void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[]);
 
 
 int main(void)
@@ -50,6 +52,7 @@ int main(void)
     char choice = '\0';
     PLUTable* lookupTable = initializePLUTable();
     fillLookupTable(lookupTable);
+    srand(time(NULL));        //
 
     do
     {
@@ -196,6 +199,15 @@ int makeChange(double cost, double received) {
     return change == (received - cost) ? 0 : 1;
 }
 
+double generateRandomPayment(double totalBill) {
+    int integerPart = rand() % 100 + 1; 
+    int decimalPart = rand() % 100;     
+
+    double randomPayment = totalBill + integerPart + (double)decimalPart / 100;
+
+    return randomPayment;
+}
+
 void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[])
 {
     CartItem* ptr;
@@ -219,5 +231,5 @@ void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[])
         }
     }
 
-    printf(makeChange(totalBill, 47.20) == 0 ? "good\n" : "bad\n");
+    printf(makeChange(totalBill, generateRandomPayment(totalBill)) == 0 ? "good\n" : "bad\n");
 }
