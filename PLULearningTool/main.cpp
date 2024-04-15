@@ -1,7 +1,13 @@
 #include "hashtable.h"
+#include "input.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 
 #define CHANGE_NUMBER 7         // Represents the number of different coins/bills that can be given
-                                // as change to the customer (dimes, quarters, etc.)
+// as change to the customer (dimes, quarters, etc.)
 
 typedef struct CartItem {
     char name[NAME_LENGTH];
@@ -33,8 +39,11 @@ typedef struct Result {
 //- holds up to 5 items
 
 // function prototypes
-int makeChange(double, double);
 void fillLookupTable(PLUTable*);
+double caculateBill(PLUTable* lookupTable, CartItem* queue[]);
+int makeChange(double, double);
+void playtest(CartItem* stack[], CartItem* queue[]);
+
 
 int main(void)
 {
@@ -105,6 +114,45 @@ void fillLookupTable(PLUTable* lookupTable) {
     }
 }
 
+double caculateBill(PLUTable* lookupTable, CartItem* queue[])
+{
+    CartItem* ptr;
+    char name[NAME_LENGTH];
+    double itemPrice = 0.0;
+    double totalBill = 0.0;
+
+    while (!isQueueEmpty()) // Call isQueueEmpty function to check if the queue is empty
+    {
+        getString("please enter the name of the items", name); // Use strcpy for string copying
+        ptr = queuePop(queue);   // Get an element from the queue
+
+        if (ptr == NULL) {
+            continue; // Skip if ptr is NULL
+        }
+
+        if (strcmp(name, ptr->name) == 0)
+        {
+            itemPrice = searchPriceByName(lookupTable , name);
+            printf("Item: %s,  price: %f ", ptr->name, itemPrice * ptr->weight);
+            totalBill += itemPrice * ptr->weight;
+        }
+        else
+        {
+            // Re-enter the name and compare again
+            while (strcmp(name, ptr->name) != 0)
+            {
+                getString("Name does not match. Please enter the correct name: ", name); // Re-enter the name
+            }
+
+            // If the name matches, calculate the price again
+            itemPrice = searchPriceByName(lookupTable, name);
+            totalBill += itemPrice * ptr->weight;
+            printf("Item: %s,  price: %f ", ptr->name, itemPrice * ptr->weight);
+        }
+    }
+    return totalBill;
+}
+
 int makeChange(double cost, double received) {
     char userChoice = '\0';
 
@@ -144,4 +192,28 @@ int makeChange(double cost, double received) {
     printf("\nChange Required: $%.2lf\n", received - cost);
     printf("Change Given: $%.2lf\n", change);
     return change == (received - cost) ? 0 : 1;
+}
+
+void playtest(CartItem* stack[], CartItem* queue[])
+{
+    CartItem* ptr;
+    double totalBill = 0.0;
+
+    if (isStackEmpty()) {
+        printf("nothing on the cart!")
+            return -1;
+    }
+
+    while (!isQueuefull() && !isQueueEmpty())
+    {
+        ptr = StackPop(stack);
+        QueuePush(queue, ptr);
+
+        if (isQueuefull())
+        {
+            totalBill += caculateBill(queue);
+        }
+    }
+
+    printf(makeChange(totalBill, 47.20) == 0 ? "good\n" : "bad\n");
 }
