@@ -59,18 +59,17 @@ void getDouble(const char inputPrompt[], double* result) {
 void getString(const char inputPrompt[], char* result) {
     char input[MAX_INPUT];
     bool loop = true;
-    while (loop) {
-        printf("\n%s >> ", inputPrompt);
-        fgets(input, (MAX_INPUT - 1), stdin);
+    printf("\n%s >> ", inputPrompt);
+    fgets(input, (MAX_INPUT - 1), stdin);
 
-        /* Check for a input buffer overflow */
-        if (strchr(input, '\n') == NULL) {
-            clearInputBuffer();
-        }
-
-        /* Remove newline character */
-        input[strlen(input) - 1] = '\0';
+    /* Check for a input buffer overflow */
+    if (strchr(input, '\n') == NULL) {
+        clearInputBuffer();
     }
+
+    /* Remove newline character */
+    input[strlen(input) - 1] = '\0';
+    sscanf(input, "%s", result);
 }
 
 #endif
