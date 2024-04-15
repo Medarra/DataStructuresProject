@@ -133,6 +133,7 @@
     <Text Include="Database.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cartItem.h" />
     <ClInclude Include="hashtable.h" />
     <ClInclude Include="input.h" />
   </ItemGroup>
