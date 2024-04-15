@@ -4,15 +4,21 @@
 // as change to the customer (dimes, quarters, etc.)
 #define MAX_ITEM      10        // Represents the maximum number of items in the cart allowed.
 
-typedef struct CartItem {
+typedef struct Item {
     char name[NAME_LENGTH];
     double weight;
-} CartItem;
+    Item* nextItem;
+} Item;
 
 typedef struct Cart {
-    CartItem* data;
+    Item* data;
     int topIndex;
 } Cart;
+
+typedef struct ConveyorBelt {
+    Item* front;
+    Item* back;
+} ConveryorBelt;
 
 //used by the results screen to show mistakes
 typedef struct Result {
@@ -29,12 +35,13 @@ typedef struct Result {
 //- contains exactly 10 items
 Cart* initializeCart(void) {
     Cart* cart = (Cart*)malloc(sizeof(Cart));
-    cart->data = (CartItem*)malloc(MAX_ITEM * sizeof(CartItem));
 
     if (cart == NULL) {
         printf("Not enough memory!");
         exit(EXIT_FAILURE);
     }
+
+    cart->data = (Item*)malloc(MAX_ITEM * sizeof(Item));
 
     if (cart->data == NULL) {
         printf("Not enough memory!");
@@ -58,6 +65,8 @@ Cart* fillCart(void) {
 //Cashier conveyor filled with CartItems
 //
 //- holds up to 5 items
+
+
 
 // function prototypes
 int makeChange(double, double);
