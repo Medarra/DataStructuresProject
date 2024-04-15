@@ -12,6 +12,7 @@ typedef struct Item {
 
 typedef struct PLUTable {
     Item* table[SIZE];
+    int numberOfItems;
 } PLUTable;
 
 int generateHash(char* itemName) {
@@ -56,6 +57,7 @@ void insertItemToTable(PLUTable* table, char* nameOfItem, int PLUOfItem, double 
     int hash = generateHash(nameOfItem);
 
     Item* newItem = initializeItem(nameOfItem, PLUOfItem, costOfItem);
+    table->numberOfItems += 1;
 
     if (table->table[hash] == NULL) {
         table->table[hash] = newItem;
