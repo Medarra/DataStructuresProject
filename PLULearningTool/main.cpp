@@ -74,14 +74,14 @@ Cart* fillCart(PLUTable* PLUtable) {
 	srand(time(NULL));
 	int chosenPLU[MAX_ITEM] = { 0 };
 
-	for (int i = 0; i < MAX_ITEM - 1; i++) {    //loop to add 10 items to cart
+	while (isStackFull(cart) == false) {    //loop until cart is full
 		bool alreadyChosen = false;
 		int randomIndex = 0;
 
 		do {
 			randomIndex = rand() % itemCount;   //random seed
 
-			for (int j = 0; j < i; j++) {       //loop to ensure index has not been chosen yet.
+			for (int j = 0; j < cart->topIndex; j++) {       //loop to ensure index has not been chosen yet.
 				//add another data structure for efficiency?
 				if (chosenPLU[j] == randomIndex) {
 					alreadyChosen = true;
@@ -90,18 +90,22 @@ Cart* fillCart(PLUTable* PLUtable) {
 			}
 		} while (alreadyChosen);
 
-		strcpy(cart->data[i].name, PLUtable->table[randomIndex]->name);
+		strcpy(cart->data[cart->topIndex].name, PLUtable->table[randomIndex]->name);
 		cart->topIndex++;
 
-		if (i == 0) {
+		if (cart->topIndex == 0) {
 			continue;                       //to skip assigning value of nextItem.
 		}
 
-		cart->data[i--].nextItem = cart->data;
+		cart->data[cart->topIndex--].nextItem = cart->data;
 	}
 
 	return cart;
 	//fill up cart from hash table
+}
+
+bool isStackFull(Cart* cart) {
+	return cart->topIndex == MAX_ITEM - 1;
 }
 
 int countItemInTable(PLUTable* PLUtable) {
