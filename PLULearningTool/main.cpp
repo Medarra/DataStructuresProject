@@ -1,8 +1,10 @@
 #include "hashtable.h"
+#include <time.h>
 
 #define CHANGE_NUMBER 7         // Represents the number of different coins/bills that can be given
 // as change to the customer (dimes, quarters, etc.)
 #define MAX_ITEM      10        // Represents the maximum number of items in the cart allowed.
+#define MAX_CONVEYOR_BELT 5     // Represents the maximum number of items on the belt allowed.
 
 typedef struct CartItem {
     char name[NAME_LENGTH];
@@ -18,7 +20,7 @@ typedef struct Cart {
 typedef struct ConveyorBelt {
     CartItem* front;
     CartItem* back;
-} ConveryorBelt;
+} ConveyorBelt;
 
 //used by the results screen to show mistakes
 typedef struct Result {
@@ -53,13 +55,105 @@ Cart* initializeCart(void) {
     return cart;
 }
 
-Cart* fillCart(void) {
+Cart* fillCart(PLUTable* PLUtable) {
+    if (PLUtable == NULL) {
+        printf("Table is empty!!!");
+        return NULL;
+    }
+
     Cart* cart = initializeCart();
 
+    int itemCount = countItemInTable(PLUtable);
+
+    if (itemCount <= 0) {
+        printf("Table is empty!!!");
+        return NULL;
+    }
+
+    srand(time(NULL));
+    int chosenPLU[MAX_ITEM] = { 0 };
+
+    for (int i = 0; i < MAX_ITEM - 1; i++) {
+        bool alreadyChosen = false;
+        int randomIndex = 0;
+        
+        do {
+            randomIndex = rand() % itemCount;
+
+            for (int j = 0; j < i; j++) {
+                if (chosenPLU[j] == randomIndex) {
+                    alreadyChosen = true;
+                }
+
+            }
+        } while (alreadyChosen);
+
+        strcpy(cart->data[i].name, PLUtable->table[randomIndex]->name);
+        cart->topIndex++;
+
+        if (i == 0) {
+            continue;                       //to skip assigning value of nextItem.
+        }
+
+        cart->data[i--].nextItem = cart->data;
+    }
+
+    return cart;
     //fill up cart from hash table
 }
 
+int countItemInTable(PLUTable* PLUtable) {
+    Item* current = PLUtable->table[0];
 
+    if (current == NULL) {
+        printf("No item in the table!!!");
+        return 0;
+    }
+
+    int counter = 1;
+
+    while (current->NextItemValuePair != NULL) {
+        current = current->NextItemValuePair;
+        counter++;
+    }
+
+    return counter;
+}
+
+ConveyorBelt* initializingConveyorBelt(void) {
+    ConveyorBelt* belt = (ConveyorBelt*)malloc(sizeof(ConveyorBelt));
+    
+    if (belt == NULL) {
+        if (belt == NULL) {
+            printf("Not enough memory!");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    belt->front = NULL;
+    belt->back = NULL;
+
+    return belt;
+}
+
+ConveyorBelt* fillingConveyorBelt(Cart* cart) {
+    ConveyorBelt* belt = initializingConveyorBelt();
+
+    for (int i = 0; i < MAX_CONVEYOR_BELT - 1; i++) {               //adds 5 items to belt
+        CartItem* newItem = (CartItem*)malloc(sizeof(CartItem));
+        *newItem = cart->data[i];
+
+        if (belt->front == NULL) {
+            belt->front = newItem;
+            belt->back = newItem;
+        }
+
+        belt->back->nextItem = newItem;
+        belt->back = newItem;
+    }
+
+    return belt;
+}
 //==== = QUEUE==== =
 //
 //Cashier conveyor filled with CartItems
