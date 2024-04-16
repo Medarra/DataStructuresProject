@@ -37,7 +37,7 @@ int main(void) {
         printf("PLU Learning Tool\n");
         printf("=================\n\n");
         printf("1. Create Testing Cart\n");
-        printf("1. Play Testing Session\n");
+        printf("2. Play Testing Session\n");
         printf("3. View PLU Codes\n");
         printf("4. Exit\n");
 
