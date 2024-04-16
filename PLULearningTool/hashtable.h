@@ -74,15 +74,15 @@ void insertItemToTable(PLUTable* table, char* nameOfItem, int PLUOfItem, double 
 
 char* userInputItem(PLUTable* table, char* itemName) {
     char choice = '\0';
-    int* plu = NULL;
-    double* price = NULL;
+    int plu = 0;
+    double price = 0;
 
     printf("\nERROR: Cannot find this item to put in our database. Would you like to add it to your cart anyway? (y/n)");
     switch (choice = getch()) {
     case 'y':
-        getInteger("What is the PLU of your item?", plu);
-        getDouble("What is the price of your item?", price);
-        insertItemToTable(table, itemName, *plu, *price);
+        getInteger("What is the PLU of your item?", &plu);
+        getDouble("What is the price of your item?", &price);
+        insertItemToTable(table, itemName, plu, price);
 
         return itemName;
     case 'n':
