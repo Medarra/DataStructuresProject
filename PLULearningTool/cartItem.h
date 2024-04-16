@@ -116,7 +116,7 @@ ConveyorBelt* initializingConveyorBelt(void) {
 		exit(EXIT_FAILURE);
 	}
 
-	belt->data = (CartItem*)malloc(MAX_CONVEYOR_BELT * sizeof(CartItem);
+	belt->data = (CartItem*)malloc(MAX_CONVEYOR_BELT * sizeof(CartItem));
 
 	if (belt->data == NULL) {
 		printf("Not enough memory!");
