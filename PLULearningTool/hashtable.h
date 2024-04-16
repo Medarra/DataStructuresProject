@@ -168,3 +168,20 @@ void printPLUSheet(PLUTable* table) {
     }
 }
 
+void freeHashTable(PLUTable* table) {
+    for (int i = 0; i < SIZE; i++) {
+        if (table->table[i] == NULL) {
+            continue;
+        }
+        else {
+            Item* current = table->table[i];
+            Item* nextValue = NULL;
+
+            while (current != NULL) {
+                nextValue = current->NextItemValuePair;
+                free(current);
+                current = nextValue;
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-#define MAX_ITEM      2       // Represents the maximum number of items in the cart allowed.
+#define MAX_ITEM      10       // Represents the maximum number of items in the cart allowed.
 #define MAX_CONVEYOR_BELT 5     // Represents the maximum number of items on the belt allowed.
 
 typedef struct CartItem {
@@ -102,6 +102,18 @@ bool isCartEmpty(Cart* cart) {
 	return cart->topIndex == -1;
 }
 
+void clearCart(Cart* cart) {
+	for (int i = 0; i < MAX_ITEM; i++) {
+		strcpy(cart->data->name, "");
+		cart->data->weight = 0;
+	}
+}
+
+void freeCart(Cart* cart) {
+	free(cart->data);
+	cart->topIndex = 0;
+}
+
 /*********************************************************************/
 /*********************************************************************/
 /*****************************    Queue	  ****************************/
@@ -175,93 +187,8 @@ bool isBeltEmpty(ConveyorBelt* belt) {
 	return belt->front == -1;
 }
 
-//maybe add push part
-/*Cart* fillCart(PLUTable* PLUtable) {
-	if (PLUtable == NULL) {             //error checking
-		printf("Table is empty!!!");
-		return NULL;
-	}
-
-	Cart* cart = initializeCart();
-
-	int itemCount = countItemInTable(PLUtable);
-
-	if (itemCount <= 0) {               //error checking
-		printf("Table is empty!!!");
-		return NULL;
-	}
-
-	srand(time(NULL));
-	int chosenPLU[MAX_ITEM] = { 0 };
-
-	while (isStackFull(cart) == false) {    //loop until cart is full
-		bool alreadyChosen = false;
-		int randomIndex = 0;
-
-		do {
-			randomIndex = rand() % itemCount;   //random seed
-
-			for (int j = 0; j < cart->topIndex; j++) {       //loop to ensure index has not been chosen yet.
-				//add another data structure for efficiency?
-				if (chosenPLU[j] == randomIndex) {
-					alreadyChosen = true;
-				}
-
-			}
-		} while (alreadyChosen);
-
-		strcpy(cart->data[cart->topIndex].name, PLUtable->table[randomIndex]->name);
-		cart->topIndex++;
-
-		if (cart->topIndex == 0) {
-			continue;                       //to skip assigning value of nextItem.
-		}
-
-		cart->data[cart->topIndex--].nextItem = cart->data;
-	}
-
-	return cart;
-	//fill up cart from hash table
+void freeConveyor(ConveyorBelt* conveyor) {
+	free(conveyor->data);
+	conveyor->front = -1;
+	conveyor->back = -1;
 }
-
-bool isStackFull(Cart* cart) {
-	return cart->topIndex == MAX_ITEM - 1;
-}
-
-ConveyorBelt* initializingConveyorBelt(void) {
-	ConveyorBelt* belt = (ConveyorBelt*)malloc(sizeof(ConveyorBelt));
-
-
-	if (belt == NULL) {
-		printf("Not enough memory!");
-		exit(EXIT_FAILURE);
-	}
-
-
-	belt->front = NULL;
-	belt->back = NULL;
-
-	return belt;
-}
-
-ConveyorBelt* fillingConveyorBelt(Cart* cart) {
-	ConveyorBelt* belt = initializingConveyorBelt();
-
-	for (int i = 0; i < MAX_CONVEYOR_BELT - 1; i++) {               //adds 5 items to belt
-		CartItem* newItem = (CartItem*)malloc(sizeof(CartItem));
-		*newItem = cart->data[i];
-
-		if (belt->front == NULL) {
-			belt->front = newItem;
-			belt->back = newItem;
-
-			//need popping stack
-		}
-
-		belt->back->nextItem = newItem;
-		belt->back = newItem;
-		//need popping stack
-	}
-
-	return belt;
-}*/

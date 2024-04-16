@@ -12,11 +12,6 @@
 #define SCORE_HIGH      50
 #define SCORE_MID       30
 
-//used by the results screen to show mistakes
-typedef struct Result {
-    Item* itemPTR;
-    int incorrectPLU;
-} Result;
 
 // function prototypes
 void fillLookupTable(PLUTable*);
@@ -35,7 +30,7 @@ int main(void) {
     Cart* cart = initializeCart();
     ConveyorBelt* conveyor = NULL;
     fillLookupTable(lookupTable);
-    srand(time(NULL));        //
+    srand(time(NULL));
 
     do {
         system("CLS");
@@ -50,7 +45,7 @@ int main(void) {
         switch (choice = getch()) {
         case '1': /*--Create a Cart for testing--*/
             if (!isCartEmpty(cart)) {
-                // empty cart
+                clearCart(cart);
             }
             createNewCart(lookupTable, cart);
             break;
@@ -65,7 +60,12 @@ int main(void) {
     } while (choice != '4');
 
     // Free resources 
+    freeHashTable(lookupTable);
     free(lookupTable);
+    freeCart(cart);
+    free(cart);
+    freeConveyor(conveyor);
+    free(conveyor);
     return 0;
 }
 
