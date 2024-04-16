@@ -19,14 +19,36 @@ typedef struct ConveyorBelt {
 	CartItem* back;
 } ConveyorBelt;
 
-//function prototypes
+//function prototype for cartItem
+CartItem* createNewCartItem(char* itemName, double itemWeight);
+//function prototypes for cart
 Cart* initializeCart(void);
 void pushCart(Cart* cart, char* itemName, double itemWeight);
 char* popCart(Cart* cart);
 bool isCartFull(Cart* cart);
 bool isCartEmpty(Cart* cart);
-
+//function prototypes for belt
 ConveyorBelt* initializingConveyorBelt(void);
+
+/*********************************************************************/
+/*********************************************************************/
+/**************************		  CartItem		**********************/
+/*********************************************************************/
+/*********************************************************************/
+CartItem* createNewCartItem(char* itemName, double itemWeight) {
+	CartItem* newCartItem = (CartItem*)malloc(sizeof(CartItem));
+
+	if (newCartItem == NULL) {
+		printf("Not enough memory!");
+		exit(EXIT_FAILURE);
+	}
+
+	strcpy(newCartItem->name, itemName);
+	newCartItem->weight = itemWeight;
+	newCartItem->nextItem = NULL;
+
+	return newCartItem;
+}
 
 /*********************************************************************/
 /*********************************************************************/
@@ -60,8 +82,7 @@ void pushCart(Cart* cart, char* itemName, double itemWeight) {
 		exit(EXIT_FAILURE);
 	}
 
-	strcpy(cart->data[cart->topIndex].name, itemName);
-	cart->data[++cart->topIndex].weight = itemWeight;
+	cart->data[++cart->topIndex] = createNewCartItem(itemName, itemWeight);
 }
 
 char* popCart(Cart* cart) {
@@ -102,6 +123,8 @@ ConveyorBelt* initializingConveyorBelt(void) {
 
 	return belt;
 }
+
+ConveyorBelt* enqueueBelt(ConveyorBelt* belt, )
 
 
 //maybe add push part
