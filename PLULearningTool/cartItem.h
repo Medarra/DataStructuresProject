@@ -82,7 +82,7 @@ void pushCart(Cart* cart, char* itemName, double itemWeight) {
 		exit(EXIT_FAILURE);
 	}
 
-	cart->data[++cart->topIndex] = createNewCartItem(itemName, itemWeight);
+	cart->data[++cart->topIndex] = *(createNewCartItem(itemName, itemWeight));
 }
 
 char* popCart(Cart* cart) {
@@ -124,7 +124,7 @@ ConveyorBelt* initializingConveyorBelt(void) {
 	return belt;
 }
 
-ConveyorBelt* enqueueBelt(ConveyorBelt* belt, )
+void enqueueBelt(ConveyorBelt* belt, )
 
 
 //maybe add push part
