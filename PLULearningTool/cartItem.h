@@ -22,7 +22,7 @@ CartItem createNewCartItem(char* itemName, double itemWeight);
 //function prototypes for cart
 Cart* initializeCart(void);
 void pushCart(Cart* cart, char* itemName, double itemWeight);
-char* popCart(Cart* cart);
+CartItem popCart(Cart* cart);
 bool isCartFull(Cart* cart);
 bool isCartEmpty(Cart* cart);
 //function prototypes for belt
@@ -81,13 +81,17 @@ void pushCart(Cart* cart, char* itemName, double itemWeight) {
 	cart->data[++cart->topIndex] = createNewCartItem(itemName, itemWeight);
 }
 
-char* popCart(Cart* cart) {
+CartItem popCart(Cart* cart) {
+	CartItem retItem = { "", 0.0 };
+
 	if (isCartEmpty(cart)) {
 		printf("Cart underflow");
-		return NULL;
+		return retItem;
 	}
 
-	return cart->data[cart->topIndex--].name;
+	retItem = cart->data[cart->topIndex--];
+
+	return retItem;
 }
 
 bool isCartFull(Cart* cart) {
@@ -112,7 +116,7 @@ ConveyorBelt* initializingConveyorBelt(void) {
 		exit(EXIT_FAILURE);
 	}
 
-	belt->data = (CartItem*)malloc(MAX_CONVEYOR_BELT * sizeof(CartItem);
+	belt->data = (CartItem*)malloc(MAX_CONVEYOR_BELT * sizeof(CartItem));
 
 	if (belt->data == NULL) {
 		printf("Not enough memory!");
