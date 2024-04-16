@@ -5,7 +5,7 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define CURRENCY_NUMBER 7       /* Represents the number of different coins/bills that can be given
+#define CURRENCY_NUMBER 9       /* Represents the number of different coins/bills that can be given
                                    as change to the customer (dimes, quarters, etc.) */
 #define MAX_TRIES       3       // Maximum number of tries for the user to guess the PLU
 
@@ -18,17 +18,17 @@ typedef struct Result {
 // function prototypes
 void fillLookupTable(PLUTable*);
 double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score);
-int makeChange(double, double);
+bool makeChange(double, double);
 double generateRandomPayment(double totalBill);
 void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor);
 
 int main(void) {
     char choice = '\0';
-    char* potentialItemName = NULL;
+    char potentialItemName[MAX_INPUT] = { 0 };
     char* itemReturnName = NULL;
-    double* itemWeight = NULL;
+    double itemWeight = 0;
     PLUTable* lookupTable = initializePLUTable();
-    Cart* cart = NULL;
+    Cart* cart = initializeCart();
     ConveyorBelt* conveyor = NULL;
     fillLookupTable(lookupTable);
     srand(time(NULL));        //
@@ -45,10 +45,9 @@ int main(void) {
 
         switch (choice = getch()) {
         case '1': /*--Create a Cart for testing--*/
-            if (cart != NULL) {
-                free(cart);
+            if (!isCartEmpty(cart)) {
+                // empty cart
             }
-            cart = initializeCart();
             system("CLS");
             printf("Let's fill this cart up so we can begin testing!");
             while (!isCartFull(cart)) {
@@ -58,8 +57,8 @@ int main(void) {
                     printf("\nUnable to add this item to the cart.");
                     continue;
                 }
-                getDouble("\nPlease enter the weight of this item.", itemWeight);
-                pushCart(cart, itemReturnName, *itemWeight);
+                getDouble("\nPlease enter the weight of this item.", &itemWeight);
+                pushCart(cart, itemReturnName, itemWeight);
             }
             printf("\nYou now have a full cart! Let's head over to a testing session!");
             break;
@@ -126,7 +125,7 @@ double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score) {
         for (int i = 0; i < MAX_TRIES; i++) {
             if (pluToScan == pluOnConveyer) {
                 itemPrice = searchPriceByName(lookupTable, ptr->name);
-                printf("Item: %s    Weight: %fkg    Price: $%f \n", ptr->name, ptr->weight, itemPrice * ptr->weight);
+                printf("Item: %s    Weight: %.2fkg    Price: $%.2f \n", ptr->name, ptr->weight, itemPrice * ptr->weight);
 
                 switch (i) {
                 case 0:
@@ -149,19 +148,19 @@ double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score) {
 
         // If the name matches, calculate the price again
         itemPrice = searchPriceByName(lookupTable, ptr->name);
-        printf("Item: %s    PLU: #%d    Weight: %fkg    Price: $%f \n", ptr->name, pluOnConveyer, ptr->weight, itemPrice * ptr->weight);
+        printf("Item: %s    PLU: #%d    Weight: %.2fkg    Price: $%.2f \n", ptr->name, pluOnConveyer, ptr->weight, itemPrice * ptr->weight);
         return itemPrice * ptr->weight;
     }
 }
 
-int makeChange(double cost, double received) {
+bool makeChange(double cost, double received) {
     char userChoice = '\0';
 
     // Setup for change calculation
     /* Creates arrays for holding the names and values of each usable currency
        Creates array to hold the number of each currency the cashier is giving the customer */
-    const char* changeTypes[10] = { "Nickels", "Dimes", "Quarters", "Loonies", "Toonies", "5's", "10's" };
-    double changeAmount[CURRENCY_NUMBER] = { 0.05, 0.10, 0.25, 1.00, 2.00, 5.00, 10.00 };
+    const char* changeTypes[10] = { "Pennies", "Nickels", "Dimes", "Quarters", "Loonies", "Toonies", "5's", "10's", "20's" };
+    double changeAmount[CURRENCY_NUMBER] = { 0.01, 0.05, 0.10, 0.25, 1.00, 2.00, 5.00, 10.00, 20.00 };
     int changeCounter[CURRENCY_NUMBER] = { 0 };
 
     do {
@@ -175,7 +174,7 @@ int makeChange(double cost, double received) {
 
         // User input
         userChoice = getch();
-        if (userChoice > '0' && userChoice < '8') {
+        if (userChoice > '0' && userChoice < ':') {
             /* Subtracts the value of '0' to convert the ASCII value to an int. Example: '4'(52) - '0'(48) = 4 */
             changeCounter[userChoice - '0' - 1]++;
         }
@@ -195,7 +194,8 @@ int makeChange(double cost, double received) {
     // Print and return result
     printf("\nChange Required: $%.2lf\n", received - cost);
     printf("Change Given: $%.2lf\n", change);
-    return change == (received - cost) ? true : false;
+
+    return (int)(change * 1000) == ((int)(received * 1000) - (int)(cost * 1000)) ? true : false;
 }
 
 double generateRandomPayment(double totalBill) {
@@ -210,7 +210,7 @@ double generateRandomPayment(double totalBill) {
 void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
     CartItem* ptr;
     CartItem* currentItem;
-    int* score = 0;
+    int score = 0;
     double totalBill = 0.0;
 
     conveyor = initializingConveyorBelt();
@@ -226,11 +226,11 @@ void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
             printf("\n%s has been placed on the conveyor.", ptr->name);
         }
         
-        totalBill += scanItem(lookupTable, conveyor, score);
+        totalBill += scanItem(lookupTable, conveyor, &score);
     
     } while (!isBeltEmpty(conveyor));
 
-    printf(makeChange(totalBill, generateRandomPayment(totalBill)) == 0 ? "good\n" : "bad\n");
-    free(cart);
-    free(conveyor);
+    getch();
+    printf(makeChange(totalBill, generateRandomPayment(totalBill)) ? "good\n" : "bad\n");
+    getch();
 }
