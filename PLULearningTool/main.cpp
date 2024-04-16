@@ -118,7 +118,7 @@ double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score) {
     double itemPrice = 0;
 
     while (!isBeltEmpty(conveyor)) { // Call isQueueEmpty function to check if the queue is empty
-        ptr = &(dequeueBelt(conveyor));   // Get an element from the queue
+        ptr = dequeueBelt(conveyor);   // Get an element from the queue
 
         pluOnConveyer = searchPluByName(lookupTable, ptr->name);
 
@@ -221,7 +221,7 @@ void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
     do {
 
         while (!isBeltFull(conveyor) && !isCartEmpty(cart)) {
-            ptr = &popCart(cart);
+            ptr = popCart(cart);
             enqueueBelt(conveyor, *ptr);
             printf("\n%s has been placed on the conveyor.", ptr->name);
         }
