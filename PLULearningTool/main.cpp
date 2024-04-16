@@ -203,7 +203,7 @@ double generateRandomPayment(double totalBill) {
     return randomPayment;
 }
 
-void playtest(PLUTable* lookupTable, Cart* cart, ConveyorBelt conveyor) {
+void playtest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
     CartItem* ptr;
     CartItem* currentItem;
     int* score = 0;
@@ -215,15 +215,15 @@ void playtest(PLUTable* lookupTable, Cart* cart, ConveyorBelt conveyor) {
     }
     do {
 
-        while (!isBeltFull(&conveyor) && !isCartEmpty(cart)) {
+        while (!isBeltFull(conveyor) && !isCartEmpty(cart)) {
             ptr = &popCart(cart);
-            enqueueBelt(&conveyor, *ptr);
+            enqueueBelt(conveyor, *ptr);
             printf("\n%s has been placed on the conveyor.", ptr->name);
         }
         
-        totalBill += scanItem(lookupTable, &conveyor, score);
+        totalBill += scanItem(lookupTable, conveyor, score);
     
-    } while (!isBeltEmpty(&conveyor));
+    } while (!isBeltEmpty(conveyor));
 
     printf(makeChange(totalBill, generateRandomPayment(totalBill)) == 0 ? "good\n" : "bad\n");
 }
