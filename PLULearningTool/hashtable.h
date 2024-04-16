@@ -87,6 +87,8 @@ char* userInputItem(PLUTable* table, char* itemName) {
         return itemName;
     case 'n':
         return NULL;
+    default:
+        return NULL;
     }
 }
 
