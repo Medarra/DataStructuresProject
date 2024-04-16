@@ -2,22 +2,17 @@
 #include "hashtable.h"
 #include "cartItem.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
-
-#define CHANGE_NUMBER 7         // Represents the number of different coins/bills that can be given
-// as change to the customer (dimes, quarters, etc.)
-
+#define CURRENCY_NUMBER 7       /* Represents the number of different coins/bills that can be given
+                                   as change to the customer (dimes, quarters, etc.) */
 
 //used by the results screen to show mistakes
 typedef struct Result {
     Item* itemPTR;
     int incorrectPLU;
 } Result;
-
 
 // function prototypes
 void fillLookupTable(PLUTable*);
@@ -26,16 +21,13 @@ int makeChange(double, double);
 double generateRandomPayment(double totalBill);
 void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[]);
 
-
-int main(void)
-{
+int main(void) {
     char choice = '\0';
     PLUTable* lookupTable = initializePLUTable();
     fillLookupTable(lookupTable);
     srand(time(NULL));        //
 
-    do
-    {
+    do {
         system("CLS");
         printf("PLU Learning Tool\n");
         printf("=================\n\n");
@@ -47,7 +39,7 @@ int main(void)
 
         switch (choice = getch()) {
         case '1': /*--Create a Cart for testing--*/
-            printf(makeChange(25, 47.20) == 0 ? "good\n" : "bad\n");
+            printf(makeChange(25, 47.20) ? "good\n" : "bad\n");
             getch();
             break;
         case '2': /*--Play test session--*/
@@ -98,15 +90,13 @@ void fillLookupTable(PLUTable* lookupTable) {
     }
 }
 
-double scanItem(PLUTable* lookupTable, CartItem* queue[])
-{
+double scanItem(PLUTable* lookupTable, CartItem* queue[]) {
     CartItem* ptr;
     int pluOnConveyer = 0;
     int pluToScan = 0;
     double itemPrice = 0;
 
-    while (!isQueueEmpty()) // Call isQueueEmpty function to check if the queue is empty
-    {
+    while (!isQueueEmpty()) { // Call isQueueEmpty function to check if the queue is empty
         ptr = queuePop(queue);   // Get an element from the queue
 
         if (ptr == NULL) {
@@ -117,16 +107,13 @@ double scanItem(PLUTable* lookupTable, CartItem* queue[])
 
         getInteger("please enter the PLU in order to scan the item", &pluToScan);
 
-        if (pluToScan == pluOnConveyer)
-        {
+        if (pluToScan == pluOnConveyer) {
             itemPrice = searchPriceByName(lookupTable, ptr->name);
             printf("Item: %s    Weight: %f    Price: %f \n", ptr->name, ptr->weight, itemPrice * ptr->weight);
             return itemPrice * ptr->weight;
         }
-        else
-        {
-            while (pluToScan != pluOnConveyer)
-            {
+        else {
+            while (pluToScan != pluOnConveyer) {
                 getInteger("PLU does not match. Please enter the correct PLU: ", &pluToScan);
             }
 
@@ -142,26 +129,29 @@ int makeChange(double cost, double received) {
     char userChoice = '\0';
 
     // Setup for change calculation
+    /* Creates arrays for holding the names and values of each usable currency
+       Creates array to hold the number of each currency the cashier is giving the customer */
     const char* changeTypes[10] = { "Nickels", "Dimes", "Quarters", "Loonies", "Toonies", "5's", "10's" };
-    double changeAmount[CHANGE_NUMBER] = { 0.05, 0.10, 0.25, 1.00, 2.00, 5.00, 10.00 };
-    int changeCounter[CHANGE_NUMBER] = { 0 };
+    double changeAmount[CURRENCY_NUMBER] = { 0.05, 0.10, 0.25, 1.00, 2.00, 5.00, 10.00 };
+    int changeCounter[CURRENCY_NUMBER] = { 0 };
 
     do {
         // Displays instructions to the user
         system("CLS");
         printf("Total Cart Cost: $%.2lf\nMoney Received from Customer: $%.2lf\n\n", cost, received);
         printf("Use the numberpad to select change.\nPress <ENTER> to finish and 'r' to reset.\n\n");
-        for (int i = 0; i < CHANGE_NUMBER; i++) {
+        for (int i = 0; i < CURRENCY_NUMBER; i++) {
             printf("%d. Number of %s:\t%10d\n", (i + 1), changeTypes[i], changeCounter[i]);
         }
 
         // User input
         userChoice = getch();
         if (userChoice > '0' && userChoice < '8') {
+            /* Subtracts the value of '0' to convert the ASCII value to an int. Example: '4'(52) - '0'(48) = 4 */
             changeCounter[userChoice - '0' - 1]++;
         }
         else if (userChoice == 'r') {
-            for (int i = 0; i < CHANGE_NUMBER; i++) {
+            for (int i = 0; i < CURRENCY_NUMBER; i++) {
                 changeCounter[i] = 0;
             }
         }
@@ -169,14 +159,14 @@ int makeChange(double cost, double received) {
 
     // Calculates total change given
     double change = 0;
-    for (int i = 0; i < CHANGE_NUMBER; i++) {
+    for (int i = 0; i < CURRENCY_NUMBER; i++) {
         change += (changeAmount[i] * changeCounter[i]);
     }
 
     // Print and return result
     printf("\nChange Required: $%.2lf\n", received - cost);
     printf("Change Given: $%.2lf\n", change);
-    return change == (received - cost) ? 0 : 1;
+    return change == (received - cost) ? true : false;
 }
 
 double generateRandomPayment(double totalBill) {
@@ -188,8 +178,7 @@ double generateRandomPayment(double totalBill) {
     return randomPayment;
 }
 
-void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[])
-{
+void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[]) {
     CartItem* ptr;
     double totalBill = 0.0;
 
@@ -198,14 +187,12 @@ void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[])
             return -1;
     }
 
-    while (!isQueuefull() && !isStackEmpty())
-    {
+    while (!isQueuefull() && !isStackEmpty()) {
         ptr = StackPop(stack);
         QueuePush(queue, ptr);
         printf("%s on the conveyer\n", ptr->name);
 
-        if (isQueuefull())
-        {
+        if (isQueuefull()) {
             printf("Conveyer is full, you need to scan the item before you put more on it\n");
             totalBill += scanItem(lookupTable, queue);
         }
