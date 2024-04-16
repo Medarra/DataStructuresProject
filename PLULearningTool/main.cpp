@@ -20,7 +20,7 @@ void fillLookupTable(PLUTable*);
 double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score);
 int makeChange(double, double);
 double generateRandomPayment(double totalBill);
-void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[]);
+void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor);
 
 int main(void) {
     char choice = '\0';
@@ -28,8 +28,8 @@ int main(void) {
     char* itemReturnName = NULL;
     double* itemWeight = NULL;
     PLUTable* lookupTable = initializePLUTable();
-    Cart* cart = initializeCart();
-    ConveyorBelt* conveyor = initializingConveyorBelt();
+    Cart* cart = NULL;
+    ConveyorBelt* conveyor = NULL;
     fillLookupTable(lookupTable);
     srand(time(NULL));        //
 
@@ -45,6 +45,10 @@ int main(void) {
 
         switch (choice = getch()) {
         case '1': /*--Create a Cart for testing--*/
+            if (cart != NULL) {
+                free(cart);
+            }
+            cart = initializeCart();
             system("CLS");
             printf("Let's fill this cart up so we can begin testing!");
             while (!isCartFull(cart)) {
@@ -60,7 +64,7 @@ int main(void) {
             printf("\nYou now have a full cart! Let's head over to a testing session!");
             break;
         case '2': /*--Play test session--*/
-            playtest();
+            playTest(lookupTable, cart, conveyor);
             break;
         case '3': /*--View PLU Codes--*/
             printPLUSheet(lookupTable);
@@ -203,12 +207,13 @@ double generateRandomPayment(double totalBill) {
     return randomPayment;
 }
 
-void playtest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
+void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
     CartItem* ptr;
     CartItem* currentItem;
     int* score = 0;
     double totalBill = 0.0;
 
+    conveyor = initializingConveyorBelt();
     if (isCartEmpty(cart)) {
         printf("\nYou haven't put anything in your cart! Please put something in your cart before starting a session.");
         return;
@@ -226,4 +231,6 @@ void playtest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
     } while (!isBeltEmpty(conveyor));
 
     printf(makeChange(totalBill, generateRandomPayment(totalBill)) == 0 ? "good\n" : "bad\n");
+    free(cart);
+    free(conveyor);
 }
