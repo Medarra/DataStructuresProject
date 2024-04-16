@@ -22,13 +22,13 @@ CartItem createNewCartItem(char* itemName, double itemWeight);
 //function prototypes for cart
 Cart* initializeCart(void);
 void pushCart(Cart* cart, char* itemName, double itemWeight);
-CartItem popCart(Cart* cart);
+CartItem* popCart(Cart* cart);
 bool isCartFull(Cart* cart);
 bool isCartEmpty(Cart* cart);
 //function prototypes for belt
 ConveyorBelt* initializingConveyorBelt(void);
 void enqueueBelt(ConveyorBelt* belt, CartItem itemToEnqueue);
-CartItem dequeueBelt(ConveyorBelt* belt);
+CartItem* dequeueBelt(ConveyorBelt* belt);
 bool isBeltFull(ConveyorBelt* belt);
 bool isBeltEmpty(ConveyorBelt* belt);
 
@@ -81,15 +81,15 @@ void pushCart(Cart* cart, char* itemName, double itemWeight) {
 	cart->data[++cart->topIndex] = createNewCartItem(itemName, itemWeight);
 }
 
-CartItem popCart(Cart* cart) {
-	CartItem retItem = { "", 0.0 };
+CartItem* popCart(Cart* cart) {
+	CartItem* retItem = NULL;
 
 	if (isCartEmpty(cart)) {
 		printf("Cart underflow");
 		return retItem;
 	}
 
-	retItem = cart->data[cart->topIndex--];
+	retItem = &(cart->data[cart->topIndex--]);
 
 	return retItem;
 }
@@ -146,15 +146,15 @@ void enqueueBelt(ConveyorBelt* belt, CartItem itemToEnqueue) {
 	belt->data[belt->back] = itemToEnqueue;
 }
 
-CartItem dequeueBelt(ConveyorBelt* belt) {
-	CartItem retItem = { "", 0.0 };
+CartItem* dequeueBelt(ConveyorBelt* belt) {
+	CartItem* retItem = NULL;
 
 	if (isBeltEmpty(belt)) {
 		printf("Belt is empty!");
 		return retItem;
 	}
 
-	retItem = belt->data[belt->front];
+	retItem = &(belt->data[belt->front]);
 
 	if (belt->front == belt->back) {
 		belt->front = -1;
