@@ -12,7 +12,7 @@ typedef struct Cart {
 } Cart;
 
 typedef struct ConveyorBelt {
-	CartItem data[MAX_CONVEYOR_BELT];
+	CartItem* data;
 	int front;
 	int back;
 } ConveyorBelt;
@@ -107,12 +107,17 @@ bool isCartEmpty(Cart* cart) {
 ConveyorBelt* initializingConveyorBelt(void) {
 	ConveyorBelt* belt = (ConveyorBelt*)malloc(sizeof(ConveyorBelt));
 
-
 	if (belt == NULL) {
 		printf("Not enough memory!");
 		exit(EXIT_FAILURE);
 	}
 
+	belt->data = (CartItem*)malloc(MAX_CONVEYOR_BELT * sizeof(CartItem);
+
+	if (belt->data == NULL) {
+		printf("Not enough memory!");
+		exit(EXIT_FAILURE);
+	}
 
 	belt->front = -1;
 	belt->back = -1;
