@@ -23,7 +23,12 @@ void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[]);
 
 int main(void) {
     char choice = '\0';
+    char* potentialItemName = NULL;
+    char* itemReturnName = NULL;
+    double* itemWeight = NULL;
     PLUTable* lookupTable = initializePLUTable();
+    Cart* cart = initializeCart();
+    ConveyorBelt* conveyor = initializingConveyorBelt();
     fillLookupTable(lookupTable);
     srand(time(NULL));        //
 
@@ -39,8 +44,18 @@ int main(void) {
 
         switch (choice = getch()) {
         case '1': /*--Create a Cart for testing--*/
-            printf(makeChange(25, 47.20) ? "good\n" : "bad\n");
-            getch();
+            system("CLS");
+            printf("Let's fill this cart up so we can begin testing!");
+            while (!isCartFull(cart)) {
+                getString("\nPlease enter an item you would like to add to your cart.", potentialItemName);
+                itemReturnName = searchForItemInformation(lookupTable, potentialItemName);
+                if (itemReturnName == NULL) {
+                    break;
+                }
+                getDouble("\nPlease enter the weight of this item.", itemWeight);
+                pushCart(cart, itemReturnName, *itemWeight);
+            }
+            printf("\nYou now have a full cart! Let's head over to a testing session!");
             break;
         case '2': /*--Play test session--*/
             playtest();
