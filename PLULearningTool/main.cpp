@@ -7,11 +7,10 @@
 
 #define CURRENCY_NUMBER 9       /* Represents the number of different coins/bills that can be given
                                    as change to the customer (dimes, quarters, etc.) */
-#define MAX_TRIES       3       // Maximum number of tries for the user to guess the PLU
+#define MAX_TRIES       2       // Maximum number of extra tries for the user to guess the PLU
 
 #define SCORE_HIGH      50
 #define SCORE_MID       30
-#define SCORE_LOW       10
 
 //used by the results screen to show mistakes
 typedef struct Result {
@@ -21,6 +20,7 @@ typedef struct Result {
 
 // function prototypes
 void fillLookupTable(PLUTable*);
+void createNewCart(PLUTable*, Cart*);
 double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score);
 bool makeChange(double, double);
 double generateRandomPayment(double totalBill);
@@ -30,9 +30,7 @@ void pause(void);
 
 int main(void) {
     char choice = '\0';
-    char potentialItemName[MAX_INPUT] = { 0 };
-    char* itemReturnName = NULL;
-    double itemWeight = 0;
+
     PLUTable* lookupTable = initializePLUTable();
     Cart* cart = initializeCart();
     ConveyorBelt* conveyor = NULL;
@@ -54,19 +52,7 @@ int main(void) {
             if (!isCartEmpty(cart)) {
                 // empty cart
             }
-            system("CLS");
-            printf("Let's fill this cart up so we can begin testing!");
-            while (!isCartFull(cart)) {
-                getString("\nPlease enter an item you would like to add to your cart.", potentialItemName);
-                itemReturnName = searchForItemInformation(lookupTable, potentialItemName);
-                if (itemReturnName == NULL) {
-                    printf("\nUnable to add this item to the cart.");
-                    continue;
-                }
-                getDouble("\nPlease enter the weight of this item.", &itemWeight);
-                pushCart(cart, itemReturnName, itemWeight);
-            }
-            printf("\nYou now have a full cart! Let's head over to a testing session!");
+            createNewCart(lookupTable, cart);
             break;
         case '2': /*--Play test session--*/
             playTest(lookupTable, cart, conveyor);
@@ -116,6 +102,55 @@ void fillLookupTable(PLUTable* lookupTable) {
     }
 }
 
+void createNewCart(PLUTable* lookupTable, Cart* cart) {
+    char potentialItemName[MAX_INPUT] = { 0 };
+    char* itemReturnName = NULL;
+    double itemWeight = 0;
+
+    system("CLS");
+    printf("Let's fill this cart up so we can begin testing!");
+    while (!isCartFull(cart)) {
+        getString("\nPlease enter an item you would like to add to your cart.", potentialItemName);
+        itemReturnName = searchForItemInformation(lookupTable, potentialItemName);
+        if (itemReturnName == NULL) {
+            printf("\nUnable to add this item to the cart.");
+            continue;
+        }
+        getDouble("\nPlease enter the weight of this item.", &itemWeight);
+        pushCart(cart, itemReturnName, itemWeight);
+    }
+    printf("\nYou now have a full cart! Let's head over to a testing session!");
+}
+
+/*--------------------------------------THE GAME-------------------------------------------------*/
+
+void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
+    CartItem* ptr;
+    CartItem* currentItem;
+    int score = 0;
+    double totalBill = 0.0;
+
+    conveyor = initializingConveyorBelt();
+    if (isCartEmpty(cart)) {
+        printf("\nYou haven't put anything in your cart! Please put something in your cart before starting a session.");
+        return;
+    }
+    do {
+
+        while (!isBeltFull(conveyor) && !isCartEmpty(cart)) {
+            ptr = popCart(cart);
+            enqueueBelt(conveyor, *ptr);
+            printf("\n%s has been placed on the conveyor.", ptr->name);
+        }
+        
+        totalBill += scanItem(lookupTable, conveyor, &score);
+    
+    } while (!isBeltEmpty(conveyor));
+
+    pause();
+    testResults(score, makeChange(totalBill, generateRandomPayment(totalBill)));
+}
+
 double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score) {
     CartItem* ptr = NULL;
     int pluOnConveyer = 0;
@@ -140,9 +175,6 @@ double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score) {
                 case 1:
                     *score += SCORE_MID;
                     break;
-                case 2:
-                    *score += SCORE_LOW;
-                    break;
                 }
 
                 return itemPrice * ptr->weight;
@@ -157,6 +189,15 @@ double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score) {
         printf("Item: %s    PLU: #%d    Weight: %.2fkg    Price: $%.2f \n", ptr->name, pluOnConveyer, ptr->weight, itemPrice * ptr->weight);
         return itemPrice * ptr->weight;
     }
+}
+
+double generateRandomPayment(double totalBill) {
+    int integerPart = rand() % 100 + 1;
+    int decimalPart = rand() % 100;
+
+    double randomPayment = totalBill + integerPart + (double)decimalPart / 100;
+
+    return randomPayment;
 }
 
 bool makeChange(double cost, double received) {
@@ -204,42 +245,6 @@ bool makeChange(double cost, double received) {
     return (int)(change * 1000) == ((int)(received * 1000) - (int)(cost * 1000)) ? true : false;
 }
 
-double generateRandomPayment(double totalBill) {
-    int integerPart = rand() % 100 + 1; 
-    int decimalPart = rand() % 100;     
-
-    double randomPayment = totalBill + integerPart + (double)decimalPart / 100;
-
-    return randomPayment;
-}
-
-void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
-    CartItem* ptr;
-    CartItem* currentItem;
-    int score = 0;
-    double totalBill = 0.0;
-
-    conveyor = initializingConveyorBelt();
-    if (isCartEmpty(cart)) {
-        printf("\nYou haven't put anything in your cart! Please put something in your cart before starting a session.");
-        return;
-    }
-    do {
-
-        while (!isBeltFull(conveyor) && !isCartEmpty(cart)) {
-            ptr = popCart(cart);
-            enqueueBelt(conveyor, *ptr);
-            printf("\n%s has been placed on the conveyor.", ptr->name);
-        }
-        
-        totalBill += scanItem(lookupTable, conveyor, &score);
-    
-    } while (!isBeltEmpty(conveyor));
-
-    pause();
-    testResults(score, makeChange(totalBill, generateRandomPayment(totalBill)));
-}
-
 void testResults(int score, bool change) {
     system("CLS");
     printf("Test Results\n");
@@ -249,6 +254,9 @@ void testResults(int score, bool change) {
     printf(change ? "Yes\n" : "No\n");
     pause();
 }
+
+
+/*----------------------------------THE GREAT DIVIDER--------------------------------------------*/
 
 void pause(void) {
     printf("\nPress any key to continue...");
