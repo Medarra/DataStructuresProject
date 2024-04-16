@@ -50,7 +50,8 @@ int main(void) {
                 getString("\nPlease enter an item you would like to add to your cart.", potentialItemName);
                 itemReturnName = searchForItemInformation(lookupTable, potentialItemName);
                 if (itemReturnName == NULL) {
-                    break;
+                    printf("\nUnable to add this item to the cart.");
+                    continue;
                 }
                 getDouble("\nPlease enter the weight of this item.", itemWeight);
                 pushCart(cart, itemReturnName, *itemWeight);
