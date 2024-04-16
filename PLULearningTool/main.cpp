@@ -7,6 +7,7 @@
 
 #define CURRENCY_NUMBER 7       /* Represents the number of different coins/bills that can be given
                                    as change to the customer (dimes, quarters, etc.) */
+#define MAX_TRIES       3       // Maximum number of tries for the user to guess the PLU
 
 //used by the results screen to show mistakes
 typedef struct Result {
@@ -107,37 +108,45 @@ void fillLookupTable(PLUTable* lookupTable) {
 }
 
 double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score) {
-    CartItem* ptr;
+    CartItem* ptr = NULL;
     int pluOnConveyer = 0;
     int pluToScan = 0;
     double itemPrice = 0;
 
-    while (!isQueueEmpty()) { // Call isQueueEmpty function to check if the queue is empty
-        ptr = queuePop(queue);   // Get an element from the queue
-
-        if (ptr == NULL) {
-            break; // break if ptr is NULL
-        }
+    while (!isBeltEmpty(conveyor)) { // Call isQueueEmpty function to check if the queue is empty
+        ptr = &(dequeueBelt(conveyor));   // Get an element from the queue
 
         pluOnConveyer = searchPluByName(lookupTable, ptr->name);
 
         getInteger("please enter the PLU in order to scan the item", &pluToScan);
+        for (int i = 0; i < MAX_TRIES; i++) {
+            if (pluToScan == pluOnConveyer) {
+                itemPrice = searchPriceByName(lookupTable, ptr->name);
+                printf("Item: %s    Weight: %fkg    Price: $%f \n", ptr->name, ptr->weight, itemPrice * ptr->weight);
 
-        if (pluToScan == pluOnConveyer) {
-            itemPrice = searchPriceByName(lookupTable, ptr->name);
-            printf("Item: %s    Weight: %f    Price: %f \n", ptr->name, ptr->weight, itemPrice * ptr->weight);
-            return itemPrice * ptr->weight;
-        }
-        else {
-            while (pluToScan != pluOnConveyer) {
+                switch (i) {
+                case 0:
+                    *score += 50;
+                    break;
+                case 1:
+                    *score += 30;
+                    break;
+                case 2:
+                    *score += 10;
+                    break;
+                }
+
+                return itemPrice * ptr->weight;
+            }
+            else {
                 getInteger("PLU does not match. Please enter the correct PLU: ", &pluToScan);
             }
-
-            // If the name matches, calculate the price again
-            itemPrice = searchPriceByName(lookupTable, ptr->name);
-            printf("Item: %s    Weight: %f    Price: %f \n", ptr->name, ptr->weight, itemPrice * ptr->weight);
-            return itemPrice * ptr->weight;
         }
+
+        // If the name matches, calculate the price again
+        itemPrice = searchPriceByName(lookupTable, ptr->name);
+        printf("Item: %s    PLU: #%d    Weight: %fkg    Price: $%f \n", ptr->name, pluOnConveyer, ptr->weight, itemPrice * ptr->weight);
+        return itemPrice * ptr->weight;
     }
 }
 
