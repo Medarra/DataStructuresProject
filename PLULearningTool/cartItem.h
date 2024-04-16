@@ -1,5 +1,3 @@
-#include <time.h>
-
 #define MAX_ITEM      10        // Represents the maximum number of items in the cart allowed.
 #define MAX_CONVEYOR_BELT 5     // Represents the maximum number of items on the belt allowed.
 
