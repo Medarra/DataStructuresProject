@@ -64,8 +64,10 @@ int main(void) {
     free(lookupTable);
     freeCart(cart);
     free(cart);
-    freeConveyor(conveyor);
-    free(conveyor);
+    if (conveyor != NULL) {
+        freeConveyor(conveyor);
+        free(conveyor);
+    }
     return 0;
 }
 
