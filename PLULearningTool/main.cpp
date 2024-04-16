@@ -17,7 +17,7 @@ typedef struct Result {
 
 // function prototypes
 void fillLookupTable(PLUTable*);
-double scanItem(PLUTable* lookupTable, CartItem* queue[]);
+double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score);
 int makeChange(double, double);
 double generateRandomPayment(double totalBill);
 void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[]);
@@ -221,7 +221,7 @@ void playtest(PLUTable* lookupTable, Cart* cart, ConveyorBelt conveyor) {
             printf("\n%s has been placed on the conveyor.", ptr->name);
         }
         
-        totalBill += scanItem(lookupTable, conveyor, score);
+        totalBill += scanItem(lookupTable, &conveyor, score);
     
     } while (!isBeltEmpty(&conveyor));
 
