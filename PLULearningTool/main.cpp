@@ -216,8 +216,8 @@ void playtest(PLUTable* lookupTable, Cart* cart, ConveyorBelt conveyor) {
     do {
 
         while (!isBeltFull(&conveyor) && !isCartEmpty(cart)) {
-            ptr = popCart(cart);
-            enqueueBelt(&conveyor, ptr);
+            ptr = &popCart(cart);
+            enqueueBelt(&conveyor, *ptr);
             printf("\n%s has been placed on the conveyor.", ptr->name);
         }
         
