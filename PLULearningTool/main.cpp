@@ -194,24 +194,38 @@ double generateRandomPayment(double totalBill) {
     return randomPayment;
 }
 
-void playtest(PLUTable* lookupTable, CartItem* stack[], CartItem* queue[]) {
+void playtest(PLUTable* lookupTable, Cart* cart, ConveyorBelt conveyor) {
     CartItem* ptr;
+    CartItem* currentItem;
+    int currentItemPLU;
+    int* guessedPLU;
+    int score = 0;
     double totalBill = 0.0;
 
-    if (isStackEmpty()) {
-        printf("nothing on the cart!")
-            return -1;
+    if (isCartEmpty(cart)) {
+        printf("\nYou haven't put anything in your cart! Please put something in your cart before starting a session.");
+        return;
     }
+    do {
 
-    while (!isQueuefull() && !isStackEmpty()) {
-        ptr = StackPop(stack);
-        QueuePush(queue, ptr);
-        printf("%s on the conveyer\n", ptr->name);
-
-        if (isQueuefull()) {
-            printf("Conveyer is full, you need to scan the item before you put more on it\n");
-            totalBill += scanItem(lookupTable, queue);
+        while (!isBeltFull(conveyor) && !isCartEmpty(cart)) {
+            ptr = popCart(cart);
+            enqueueBelt(conveyor, ptr);
+            printf("\n%s has been placed on the conveyor.", ptr->name);
         }
+        
+        currentItem = dequeueConveyor(conveyor);
+        currentItemPLU = searchPluByName(lookupTable, currentItem->name);
+        printf("You are currently scanning a %s, ", currentItem);
+        getInteger("what is the PLU?", guessedPLU);
+        if (*guessedPLU == currentItemPLU) {
+            printf("\nCorrect. Let's move on!");
+            score++;
+        }
+        else {
+            printf("\nThis is incorrect. We were expected %d. Let's move on.", currentItemPLU);
+        }
+    
     }
 
     printf(makeChange(totalBill, generateRandomPayment(totalBill)) == 0 ? "good\n" : "bad\n");
