@@ -6,7 +6,6 @@
 typedef struct CartItem {
     char name[NAME_LENGTH];
     double weight;
-    CartItem* nextItem;
 } CartItem;
 
 typedef struct Cart {
@@ -15,12 +14,13 @@ typedef struct Cart {
 } Cart;
 
 typedef struct ConveyorBelt {
-	CartItem* front;
-	CartItem* back;
+	CartItem data[MAX_CONVEYOR_BELT];
+	int front;
+	int back;
 } ConveyorBelt;
 
 //function prototype for cartItem
-CartItem* createNewCartItem(char* itemName, double itemWeight);
+CartItem createNewCartItem(char* itemName, double itemWeight);
 //function prototypes for cart
 Cart* initializeCart(void);
 void pushCart(Cart* cart, char* itemName, double itemWeight);
@@ -29,23 +29,21 @@ bool isCartFull(Cart* cart);
 bool isCartEmpty(Cart* cart);
 //function prototypes for belt
 ConveyorBelt* initializingConveyorBelt(void);
+void enqueueBelt(ConveyorBelt* belt, CartItem itemToEnqueue);
+CartItem dequeueBelt(ConveyorBelt* belt);
+bool isBeltFull(ConveyorBelt* belt);
+bool isBeltEmpty(ConveyorBelt* belt);
 
 /*********************************************************************/
 /*********************************************************************/
 /**************************		  CartItem		**********************/
 /*********************************************************************/
 /*********************************************************************/
-CartItem* createNewCartItem(char* itemName, double itemWeight) {
-	CartItem* newCartItem = (CartItem*)malloc(sizeof(CartItem));
+CartItem createNewCartItem(char* itemName, double itemWeight) {
+	CartItem newCartItem;
 
-	if (newCartItem == NULL) {
-		printf("Not enough memory!");
-		exit(EXIT_FAILURE);
-	}
-
-	strcpy(newCartItem->name, itemName);
-	newCartItem->weight = itemWeight;
-	newCartItem->nextItem = NULL;
+	strcpy(newCartItem.name, itemName);
+	newCartItem.weight = itemWeight;
 
 	return newCartItem;
 }
@@ -82,7 +80,7 @@ void pushCart(Cart* cart, char* itemName, double itemWeight) {
 		exit(EXIT_FAILURE);
 	}
 
-	cart->data[++cart->topIndex] = *(createNewCartItem(itemName, itemWeight));
+	cart->data[++cart->topIndex] = createNewCartItem(itemName, itemWeight);
 }
 
 char* popCart(Cart* cart) {
@@ -118,14 +116,57 @@ ConveyorBelt* initializingConveyorBelt(void) {
 	}
 
 
-	belt->front = NULL;
-	belt->back = NULL;
+	belt->front = -1;
+	belt->back = -1;
 
 	return belt;
 }
 
-void enqueueBelt(ConveyorBelt* belt, )
+void enqueueBelt(ConveyorBelt* belt, CartItem itemToEnqueue) {
+	if (isBeltFull(belt)) {
+		printf("Belt is full!");
+		return;
+	}
+	
+	if (isBeltEmpty(belt)) {
+		belt->front = 0;
+		belt->back = 0;
+	}
+	else {
+		belt->back = (belt->back + 1) % MAX_CONVEYOR_BELT;
+	}
 
+	belt->data[belt->back] = itemToEnqueue;
+}
+
+CartItem dequeueBelt(ConveyorBelt* belt) {
+	CartItem retItem = { "", 0.0 };
+
+	if (isBeltEmpty(belt)) {
+		printf("Belt is empty!");
+		return retItem;
+	}
+
+	retItem = belt->data[belt->front];
+
+	if (belt->front == belt->back) {
+		belt->front = -1;
+		belt->back = -1;
+	}
+	else {
+		belt->front = (belt->front + 1) % MAX_CONVEYOR_BELT;
+	}
+
+	return retItem;
+}
+
+bool isBeltFull(ConveyorBelt* belt) {
+	return (belt->back + 1) % MAX_CONVEYOR_BELT == belt->front;
+}
+
+bool isBeltEmpty(ConveyorBelt* belt) {
+	return belt->front == -1;
+}
 
 //maybe add push part
 /*Cart* fillCart(PLUTable* PLUtable) {
