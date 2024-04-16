@@ -9,6 +9,10 @@
                                    as change to the customer (dimes, quarters, etc.) */
 #define MAX_TRIES       3       // Maximum number of tries for the user to guess the PLU
 
+#define SCORE_HIGH      50
+#define SCORE_MID       30
+#define SCORE_LOW       10
+
 //used by the results screen to show mistakes
 typedef struct Result {
     Item* itemPTR;
@@ -21,6 +25,8 @@ double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score);
 bool makeChange(double, double);
 double generateRandomPayment(double totalBill);
 void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor);
+void testResults(int, bool);
+void pause(void);
 
 int main(void) {
     char choice = '\0';
@@ -67,7 +73,7 @@ int main(void) {
             break;
         case '3': /*--View PLU Codes--*/
             printPLUSheet(lookupTable);
-            getch();
+            pause();
             break;
         }
     } while (choice != '4');
@@ -129,13 +135,13 @@ double scanItem(PLUTable* lookupTable, ConveyorBelt* conveyor, int* score) {
 
                 switch (i) {
                 case 0:
-                    *score += 50;
+                    *score += SCORE_HIGH;
                     break;
                 case 1:
-                    *score += 30;
+                    *score += SCORE_MID;
                     break;
                 case 2:
-                    *score += 10;
+                    *score += SCORE_LOW;
                     break;
                 }
 
@@ -194,7 +200,7 @@ bool makeChange(double cost, double received) {
     // Print and return result
     printf("\nChange Required: $%.2lf\n", received - cost);
     printf("Change Given: $%.2lf\n", change);
-
+    pause();
     return (int)(change * 1000) == ((int)(received * 1000) - (int)(cost * 1000)) ? true : false;
 }
 
@@ -230,7 +236,21 @@ void playTest(PLUTable* lookupTable, Cart* cart, ConveyorBelt* conveyor) {
     
     } while (!isBeltEmpty(conveyor));
 
-    getch();
-    printf(makeChange(totalBill, generateRandomPayment(totalBill)) ? "good\n" : "bad\n");
+    pause();
+    testResults(score, makeChange(totalBill, generateRandomPayment(totalBill)));
+}
+
+void testResults(int score, bool change) {
+    system("CLS");
+    printf("Test Results\n");
+    printf("============\n\n");
+    printf("Final Score: %d out of %d\n", score, SCORE_HIGH * MAX_ITEM);
+    printf("Gave out the correct amount of change: ");
+    printf(change ? "Yes\n" : "No\n");
+    pause();
+}
+
+void pause(void) {
+    printf("\nPress any key to continue...");
     getch();
 }
